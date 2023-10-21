@@ -22,9 +22,9 @@ if "messages" not in st.session_state.keys(): # Initialize the chat messages his
 
 def load_data():
     with st.spinner(text="Let me think about that"):
-        auth_config = weaviate.AuthApiKey(api_key=st.secrets[w_key])
+        auth_config = weaviate.AuthApiKey(api_key=st.secrets['w_key'])
         client = weaviate.Client(
-        url=st.secrets[w_url],
+        url=st.secrets['w_url'],
         auth_client_secret=auth_config
         )
         # reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
