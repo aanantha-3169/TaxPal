@@ -9,10 +9,10 @@ from llama_index.vector_stores import WeaviateVectorStore
 
 
 
-st.set_page_config(page_title="TaxPal", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title="TaxPal", page_icon="💰", layout="centered", initial_sidebar_state="auto", menu_items=None)
 openai.api_key = st.secrets["openai_key"]
 #openai.api_key = st.secrets.openai_key
-st.title("Taxpal: Your personal income tax assistant 💬🦙")
+st.title("TaxPal: Your personal income tax assistant 🧾👨🏻‍🏫")
 #st.info(".streamlit.io/build-a--with-custom-data-sources-powered-by-llamaindex/)", icon="📃")
          
 if "messages" not in st.session_state.keys(): # Initialize the chat messages history
@@ -33,7 +33,7 @@ def load_data():
                 weaviate_client=client, index_name="TaxIndex"
             )
 
-        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts."))
+        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts."))
         
         loaded_index = VectorStoreIndex.from_vector_store(vector_store, service_context = service_context)
 
