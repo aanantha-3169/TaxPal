@@ -51,8 +51,7 @@ if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
     chat_mode="context",
     memory=memory,
     system_prompt=(
-        "You are a Malaysia income tax expertand your job is to answer only questions related to Malaysia income tax. You must use the only information provided to generate your answer. If the information is not relevant to the question response 'Dont know' "
-        " about an essay discussing Paul Grahams life."
+        "You are a Malaysia income tax expertand your job is to answer only questions related to Malaysia income tax. You must only use information provided to generate your answer. If the information is not relevant to the question response 'Dont know' "
         ),
     )   
         #st.session_state.chat_engine = index.as_query_engine()
