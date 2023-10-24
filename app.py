@@ -6,6 +6,7 @@ from llama_index import SimpleDirectoryReader
 import weaviate
 from llama_index.storage.storage_context import StorageContext
 from llama_index.vector_stores import WeaviateVectorStore
+from llama_index.memory import ChatMemoryBuffer
 
 
 
@@ -33,9 +34,11 @@ def load_data():
                 weaviate_client=client, index_name="TaxIndex"
             )
 
-        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts."))
+        #service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts."))
         
-        loaded_index = VectorStoreIndex.from_vector_store(vector_store, service_context = service_context)
+        loaded_index = VectorStoreIndex.from_vector_store(vector_store
+        #, service_context = service_context
+        )
 
         # index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return loaded_index
@@ -44,7 +47,14 @@ index = load_data()
 #chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True, system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts.")
 
 if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
-        st.session_state.chat_engine = index.as_chat_engine(verbose=True)
+        st.session_state.chat_engine = index.as_chat_engine(
+    chat_mode="context",
+    memory=memory,
+    system_prompt=(
+        "You are a Malaysia income tax expertand your job is to answer only questions related to Malaysia income tax. You must use the only information provided to generate your answer. If the information is not relevant to the question response 'Dont know' "
+        " about an essay discussing Paul Grahams life."
+        ),
+    )   
         #st.session_state.chat_engine = index.as_query_engine()
 if prompt := st.chat_input("Your question"): # Prompt for user input and save to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
