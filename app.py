@@ -45,7 +45,7 @@ def load_data():
 
 index = load_data()
 #chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True, system_prompt="You are an expert on the Malaysian incomes tax and your job is to answer users questions. Assume that all questions are related to Malaysian income tax. Keep your answers based on facts – do not hallucinate facts.")
-
+memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
 if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
         st.session_state.chat_engine = index.as_chat_engine(
     chat_mode="context",
