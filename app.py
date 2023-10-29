@@ -19,7 +19,7 @@ if "messages" not in st.session_state.keys(): # Initialize the chat messages his
     ]
 
 def load_data():
-    with st.spinner(text="Let me think about that"):
+    with st.spinner(text="Waking up TaxPal 😴"):
         auth_config = weaviate.AuthApiKey(api_key=st.secrets['w_key'])
         
 
@@ -32,7 +32,10 @@ def load_data():
                 weaviate_client=client, index_name="TaxIndex"
             )
         
+        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", system_prompt="You are a Malaysia income tax expert and your job is to answer only questions related to Malaysia income tax. You must only use information provided to generate your answer. If the information is not relevant to the question response 'Dont know'. You must very answer questions that are not related to income tax."))
+        
         loaded_index = VectorStoreIndex.from_vector_store(vector_store
+        , service_context = service_context
         )
 
         return loaded_index
@@ -40,15 +43,18 @@ def load_data():
 index = load_data()
 
 memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
+
 if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
-        st.session_state.chat_engine = index.as_chat_engine(
-    chat_mode="context",
-    memory=memory,
-    system_prompt=(
-        "You are a Malaysia income tax expert and your job is to answer only questions related to Malaysia income tax. You must only use information provided to generate your answer. If the information is not relevant to the question response 'Dont know' "
-        ),
-        verbose = True
-    )   
+     st.session_state.chat_engine = index.as_chat_engine(chat_mode="condense_question",
+     verbose=True)
+#  st.session_state.chat_engine = index.as_chat_engine(
+#     chat_mode="context",
+#     memory=memory,
+#     system_prompt=(
+#         "You are a Malaysia income tax expert and your job is to answer only questions related to Malaysia income tax. You must only use information provided to generate your answer. If the information is not relevant to the question response 'Dont know' "
+#         ),
+#         verbose = True
+#     )   
 if prompt := st.chat_input("Your question"): # Prompt for user input and save to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -56,11 +62,11 @@ for message in st.session_state.messages: # Display the prior chat messages
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# If last message is not from assistant, generate a new response
-if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            response = st.session_state.chat_engine.chat(prompt)
-            st.write(response.response)
-            message = {"role": "assistant", "content": response.response}
-            st.session_state.messages.append(message) # Add response to message history
+# # If last message is not from assistant, generate a new response
+# if st.session_state.messages[-1]["role"] != "assistant":
+#     with st.chat_message("assistant"):
+#         with st.spinner("Thinking..."):
+#             response = st.session_state.chat_engine.chat(prompt)
+#             st.write(response.response)
+#             message = {"role": "assistant", "content": response.response}
+#             st.session_state.messages.append(message) # Add response to message history
